@@ -3,8 +3,9 @@ import 'package:giftify/constants/colors.dart';
 
 class PasswordTextField extends StatefulWidget {
   final String hintText;
+  final ValueChanged<String>? onChanged;
 
-  PasswordTextField({required this.hintText});
+  PasswordTextField({required this.hintText, this.onChanged});
 
   @override
   _PasswordTextFieldState createState() => _PasswordTextFieldState();
@@ -12,7 +13,37 @@ class PasswordTextField extends StatefulWidget {
 
 class _PasswordTextFieldState extends State<PasswordTextField> {
   bool _obscureText = true;
-  TextEditingController _controller = TextEditingController();
+  
+  final _textEditingController = TextEditingController();
+  final ValueChanged<String>? onChanged;
+
+  _PasswordTextFieldState({
+    Key? key,
+    this.onChanged,
+  });
+
+  @override
+  void initState() {
+    super.initState();
+    _textEditingController.addListener(() {
+      int cursorPosition = _textEditingController.selection.start;
+      _textEditingController.value = _textEditingController.value.copyWith(
+        text: _textEditingController.text,
+        selection: TextSelection(
+          baseOffset: cursorPosition,
+          extentOffset: cursorPosition,
+        ),
+        composing: TextRange.empty,
+      );
+    });
+  }
+
+
+  @override
+  void dispose(){
+    _textEditingController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +51,7 @@ class _PasswordTextFieldState extends State<PasswordTextField> {
       style: const TextStyle(
         color: AppColors.maintextColor
       ),
-      controller: _controller,
+      controller: _textEditingController,
 
       decoration: InputDecoration(
 
@@ -60,28 +91,9 @@ class _PasswordTextFieldState extends State<PasswordTextField> {
         ),
       ),
       obscureText: _obscureText,
+
+      onChanged: onChanged,
     );
   }
 
-  @override
-  void initState() {
-    super.initState();
-    _controller.addListener(() {
-      int cursorPosition = _controller.selection.start;
-      _controller.value = _controller.value.copyWith(
-        text: _controller.text,
-        selection: TextSelection(
-          baseOffset: cursorPosition,
-          extentOffset: cursorPosition,
-        ),
-        composing: TextRange.empty,
-      );
-    });
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
 }

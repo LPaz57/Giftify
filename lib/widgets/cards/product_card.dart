@@ -5,10 +5,19 @@ import 'package:giftify/widgets/app_text.dart';
 import 'package:giftify/constants/colors.dart';
 
 class ProductCard extends StatelessWidget {
+
   final String pathImage;
+  final String name;
+  final double price;
+  final int rating;
+  final String description;
 
   const ProductCard({
+    required this.name,
     required this.pathImage,
+    required this.price,
+    required this.rating,
+    required this.description,
   });
 
   @override
@@ -18,7 +27,7 @@ class ProductCard extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => ProductPage(),
+                    builder: (context) => ProductPage(name: name, pathImage: pathImage, price: price, rating: rating, description: description),
                   )
                 );
               },
@@ -35,13 +44,14 @@ class ProductCard extends StatelessWidget {
               width: 152,
               height: 100,
               child: Container(
-                decoration: const BoxDecoration(
+                decoration: BoxDecoration(
                   borderRadius: BorderRadius.only(
                     topLeft: Radius.circular(8),
                     topRight: Radius.circular(8)
                   ),
                   image: DecorationImage(
-                    image: AssetImage("assets/images/card2.png")
+                    image: Image.network(pathImage).image,
+                    fit: BoxFit.cover
                   )
                 ),
               ),
@@ -61,13 +71,13 @@ class ProductCard extends StatelessWidget {
               
               padding: const EdgeInsets.all(10),
               child: Column(children: [
-                AppLargeText(text: 'Juego de velas perfumadas', size: 16,),
+                AppLargeText(text: name, size: 16,),
                 Row(
                   children: [
                     const Icon(Icons.star, color: AppColors.starColor,),
-                    AppText(text: '4.5', color: AppColors.textColor4, size: 12,),
+                    AppText(text: "$rating", color: AppColors.textColor4, size: 12,),
                     Container(width: 58,),
-                    AppText(text: "\$300", size: 12,)
+                    AppText(text: "\$$price", size: 12,)
                   ],
                 )
               ]),

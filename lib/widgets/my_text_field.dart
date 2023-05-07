@@ -1,19 +1,55 @@
 import 'package:flutter/material.dart';
 import 'package:giftify/constants/colors.dart';
 
-class MyTextField extends StatelessWidget {
+class MyTextField extends StatefulWidget {
+  final String hintText;
+  final IconData? icon;
+  final double width;
+  const MyTextField({super.key, required this.hintText, this.icon, this.width = 327});
+
+  @override
+  State<MyTextField> createState() => _myTextField(hintText: hintText, icon: icon, width: width);
+}
+
+class _myTextField extends State<MyTextField> {
+  
   final String hintText;
   final IconData? icon;
   final double width;
   final ValueChanged<String>? onChanged;
 
-  const MyTextField({
+  _myTextField({
     Key? key,
     required this.hintText,
     this.icon,
     this.width = 327,
     this.onChanged,
-  }) : super(key: key);
+  });
+
+  final _textEditingController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _textEditingController.addListener(() {
+      int cursorPosition = _textEditingController.selection.start;
+      _textEditingController.value = _textEditingController.value.copyWith(
+        text: _textEditingController.text,
+        selection: TextSelection(
+          baseOffset: cursorPosition,
+          extentOffset: cursorPosition,
+        ),
+        composing: TextRange.empty,
+      );
+    });
+  }
+
+
+  @override
+  void dispose(){
+    _textEditingController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -21,6 +57,8 @@ class MyTextField extends StatelessWidget {
       width: width,
       height: 40,
       child: TextField(
+        controller: _textEditingController,
+
         style: const TextStyle(
           color: AppColors.maintextColor
         ),

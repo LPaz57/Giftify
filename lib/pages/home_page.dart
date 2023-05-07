@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:giftify/pages/product_page.dart';
 import 'package:giftify/pages/profile_page.dart';
-import 'package:giftify/pages/purchase_history_page.dart';
 import 'package:giftify/widgets/app_text.dart';
 import 'package:giftify/widgets/category_button_list.dart';
 import 'package:giftify/constants/colors.dart';
@@ -9,6 +7,7 @@ import 'package:giftify/widgets/icon_cart.dart';
 import 'package:giftify/widgets/cards/product_card.dart';
 import 'package:giftify/widgets/app_large_text.dart';
 import 'package:giftify/widgets/cards/promo_card.dart';
+import 'package:graphql_flutter/graphql_flutter.dart';
 
 
 class HomePage extends StatefulWidget {
@@ -20,10 +19,21 @@ class HomePage extends StatefulWidget {
 
 class _HomePage extends State<HomePage> {
 
-  final pathImage = "assets/images/regalos2.png";
-
+  
   @override
   Widget build(BuildContext context) {
+
+    String readGifts = """
+              query { gifts {
+                id
+                name
+                rating
+                price
+                image
+                description
+                } 
+              }""";
+
     return Scaffold(
       resizeToAvoidBottomInset: true,
 
@@ -98,18 +108,42 @@ class _HomePage extends State<HomePage> {
             ),
 
             Expanded(
-              child: ListView.builder(
-                itemCount: 8,
-                itemBuilder: (BuildContext context, int index) {
-                  return Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: const [
-                      ProductCard(pathImage: "assets/images/card2.png"),
-                      SizedBox(width: 12,),
-                      ProductCard(pathImage: "assets/images/card2.png")
-                    ],
-                  );
-                },
+
+              child: Query(
+                options: QueryOptions(
+                document: gql(readGifts), // this is the query string you just created
+                ),
+
+                builder: (QueryResult result, { VoidCallback? refetch, FetchMore? fetchMore }) {
+                  if (result.hasException) {
+                      return Text(result.exception.toString());
+                  }
+
+                  if (result.isLoading) {
+                    return const Text('Loading');
+                  }
+
+                  List? gifts = result.data?['gifts'];
+                  
+                  if (gifts == null) {
+                    return const Text('No repositories');
+                  }
+                
+                return ListView.builder(
+                  itemCount: gifts.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    final gift = gifts[index];
+                    return Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        ProductCard(pathImage: gift['image'], name: gift['name'], price: gift['price'], rating: gift['rating'], description: gift ['description'],),
+                        SizedBox(width: 12,),
+                        ProductCard(pathImage: gift['image'], name: gift['name'], price: gift['price'], rating: gift['rating'], description: gift ['description'],),
+                      ],
+                    );
+                  },
+                );
+                }
               ),
             ),
           ]

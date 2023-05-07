@@ -57,9 +57,9 @@ class _SearchResultPage extends State<SearchResultPage> {
                   return Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: const [
-                      ProductCard(pathImage: "assets/images/card2.png"),
+                      //ProductCard(pathImage: "assets/images/card2.png"),
                       SizedBox(width: 12,),
-                      ProductCard(pathImage: "assets/images/card2.png")
+                      //ProductCard(pathImage: "assets/images/card2.png")
                     ],
                   );
                 },

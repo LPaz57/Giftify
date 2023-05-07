@@ -8,18 +8,38 @@ import 'package:giftify/constants/colors.dart';
 import 'package:giftify/widgets/buttons/elevated_button.dart';
 import 'package:giftify/widgets/app_large_text.dart';
 import 'package:giftify/widgets/app_text.dart';
-import 'package:giftify/widgets/icon_cart.dart';
 
 class ProductPage extends StatefulWidget {
-  const ProductPage({super.key});
+
+  final String name;
+  final String description;
+  final double price;
+  final String pathImage;
+  final int rating;
+
+  const ProductPage(
+    {super.key, required this.name, required this.description, required this.price, required this.pathImage, required this.rating}
+  );
 
   @override
-  State<ProductPage> createState() => _ProductPage();
+  State<ProductPage> createState() => _ProductPage(name, description, price, pathImage, rating);
 }
 
 class _ProductPage extends State<ProductPage> {
 
-  final pathImage = "assets/images/regalos2.png";
+  final String name;
+  final String description;
+  final double price;
+  final String pathImage;
+  final int rating;
+
+  _ProductPage(
+    this.name, 
+    this.description, 
+    this.price, 
+    this.pathImage, 
+    this.rating
+    );
 
     int indexTap = 0;
 
@@ -50,23 +70,23 @@ class _ProductPage extends State<ProductPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            CardImage(pathImage: 'assets/images/card3.png'),
+            CardImage(pathImage: pathImage),
             Padding(
               padding: const EdgeInsets.only(top: 12, ),
-              child: AppLargeText(text: 'Juego de velas perfumadas', size: 16,),
+              child: AppLargeText(text: name, size: 16,),
             ),
             Padding(
               padding: const EdgeInsets.only(top:4,),
               child: Row(
                 children: [
                   Icon(Icons.star, color: AppColors.starColor,),
-                  AppText(text: ' 4.5 | 1.2 km | Buen empaque', size: 12, color: AppColors.textColor4,)
+                  AppText(text: ' $rating | 1.2 km | Buen empaque', size: 12, color: AppColors.textColor4,)
                 ],
               )
             ),
             Padding(
               padding: const EdgeInsets.only(top:12, right: 24),
-              child: AppText(text: 'Crea un ambiente relajante con un juego de velas bellamente perfumadas.', size: 12, color: AppColors.textColor2,),
+              child: AppText(text: description, size: 12, color: AppColors.textColor2,),
             ),
 
             Padding(

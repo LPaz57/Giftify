@@ -7,9 +7,12 @@ import 'package:giftify/constants/colors.dart';
 import 'package:giftify/widgets/passwd_text_field.dart';
 import 'package:giftify/widgets/buttons/elevated_button.dart';
 import 'package:giftify/widgets/buttons/text_button.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 class Login extends StatefulWidget {
-  const Login({super.key});
+
+  Login({super.key});
 
   @override
   State<Login> createState() => _Login();
@@ -17,7 +20,34 @@ class Login extends StatefulWidget {
 
 class _Login extends State<Login> {
 
+  String password = "";
+  String email = "";
+
   final pathImage = "assets/images/regalos2.png";
+
+  void login() async {
+  var url = Uri.parse('https://jsonplaceholder.typicode.com/posts');
+  var response = await http.post(url, body: {
+    'email': 'Mi primer post',
+    'password': 'Este es el cuerpo de mi primer post',
+    'userId': '1'
+  });
+
+  if (response.statusCode == 201) {
+    var jsonResponse = jsonDecode(response.body);
+    print('El ID del nuevo post es: ${jsonResponse['id']}');
+  } else {
+    print('Request failed with status: ${response.statusCode}.');
+  }
+  }
+
+  final _textEditingController = TextEditingController();
+
+  @override
+  void dispose(){
+    _textEditingController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -87,14 +117,19 @@ class _Login extends State<Login> {
                     const SizedBox(height: 16),
       
                     AppText(
-                      text: 'Contrasena',
+                      text: 'Contraseña',
                       color: AppColors.maintextColor
                     ),
       
                     const SizedBox(height: 12),
       
-                    PasswordTextField(hintText: "mycontrasena123")
-                    
+                    PasswordTextField(hintText: "mycontrasena123", onChanged: (value) {
+                      setState(() {
+                        password = value;
+                        print(password);
+                      });
+                    }),
+                                        
                   ]
                 ),
               ),
