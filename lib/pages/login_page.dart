@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:giftify/pages/create_account_page.dart';
 import 'package:giftify/pages/home_screen.dart';
-import 'package:giftify/widgets/my_text_field.dart';
 import 'package:giftify/widgets/app_text.dart';
 import 'package:giftify/constants/colors.dart';
-import 'package:giftify/widgets/passwd_text_field.dart';
 import 'package:giftify/widgets/buttons/elevated_button.dart';
 import 'package:giftify/widgets/buttons/text_button.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:flutter_redux/flutter_redux.dart';
+import 'package:giftify/types/user_response.dart';
+import 'package:giftify/store/actions.dart' as Actions;
 
 class Login extends StatefulWidget {
   Login({super.key});
@@ -101,7 +102,6 @@ class _Login extends State<Login> {
                       )
                     ]),
               ),
-
               Container(
                 width: 327,
                 //color: Colors.blue,
@@ -206,9 +206,6 @@ class _Login extends State<Login> {
                       ),
                     ]),
               ),
-
-              //const SizedBox(height: 80),
-
               Container(
                 width: 327,
                 margin: const EdgeInsets.only(
@@ -229,14 +226,16 @@ class _Login extends State<Login> {
                               builder: (context) => const CreateAccount()));
                     },
                   ),
-
-                  //const SizedBox(height: 12),
-
-                  ReusableElevatedButton(
-                      text: 'Iniciar sesión',
-                      onPressed: () {
-                        login(email, password);
-                      })
+                  StoreConnector<UserResponse, VoidCallback>(
+                      converter: (store) {
+                    return () => store.dispatch(Actions.Actions.LOGIN);
+                  }, builder: (context, callback) {
+                    return ReusableElevatedButton(
+                        text: 'Iniciar sesión',
+                        onPressed: () {
+                          login(email, password);
+                        });
+                  })
                 ]),
               )
             ],
