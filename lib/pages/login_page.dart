@@ -11,7 +11,6 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class Login extends StatefulWidget {
-
   Login({super.key});
 
   @override
@@ -19,33 +18,45 @@ class Login extends StatefulWidget {
 }
 
 class _Login extends State<Login> {
+  TextEditingController emailController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
 
-  String password = "";
+  bool _obscureText = true;
   String email = "";
+  String password = "";
 
   final pathImage = "assets/images/regalos2.png";
 
-  void login() async {
-  var url = Uri.parse('https://jsonplaceholder.typicode.com/posts');
-  var response = await http.post(url, body: {
-    'email': 'Mi primer post',
-    'password': 'Este es el cuerpo de mi primer post',
-    'userId': '1'
-  });
+  Future<http.Response> login(email, password) async {
+    var url = Uri.parse('https://giftify-api.up.railway.app/api/v1/auth/login');
+    Map<String, String> headers = {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+    };
+    var data = {
+      'email': email,
+      'password': password,
+    };
+    var body = json.encode(data);
+    var response = await http.post(url, headers: headers, body: body);
 
-  if (response.statusCode == 201) {
-    var jsonResponse = jsonDecode(response.body);
-    print('El ID del nuevo post es: ${jsonResponse['id']}');
-  } else {
-    print('Request failed with status: ${response.statusCode}.');
-  }
-  }
+    if (response.statusCode == 201) {
+      Navigator.of(context).pop();
+      // Acción a realizar cuando se presiona el botón
+      Navigator.push(
+          context, MaterialPageRoute(builder: (context) => HomeScreen()));
+    } else {
+      // ignore: avoid_print
+      print('${response.body}, Error: ${response.statusCode}.');
+    }
 
-  final _textEditingController = TextEditingController();
+    return response;
+  }
 
   @override
-  void dispose(){
-    _textEditingController.dispose();
+  void dispose() {
+    emailController.dispose();
+    passwordController.dispose();
     super.dispose();
   }
 
@@ -62,40 +73,35 @@ class _Login extends State<Login> {
             children: [
               Container(
                 margin: const EdgeInsets.only(
-                  top: 150,
-                  left: 113,
-                  right: 113,
-                  bottom: 525
-                ),
+                    top: 150, left: 113, right: 113, bottom: 525),
                 width: 152,
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Container(
-                      width: 52,
-                      height: 52,
-                      decoration: const BoxDecoration(
-                        image: DecorationImage(
-                          image: AssetImage("assets/images/vector.png"),
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Container(
+                        width: 52,
+                        height: 52,
+                        decoration: const BoxDecoration(
+                          image: DecorationImage(
+                            image: AssetImage("assets/images/vector.png"),
+                          ),
                         ),
                       ),
-                    ),
-
-                    const SizedBox(height: 12,),
-
-                    const Text(
-                      'GIFTIFY',
-                      style: TextStyle(
-                        color: AppColors.maintextColor,
-                        fontFamily: "Panton",
-                        fontWeight: FontWeight.w900,
-                        fontSize: 40,
+                      const SizedBox(
+                        height: 12,
                       ),
-                    )
-                  ]
-                ),
+                      const Text(
+                        'GIFTIFY',
+                        style: TextStyle(
+                          color: AppColors.maintextColor,
+                          fontFamily: "Panton",
+                          fontWeight: FontWeight.w900,
+                          fontSize: 40,
+                        ),
+                      )
+                    ]),
               ),
-      
+
               Container(
                 width: 327,
                 //color: Colors.blue,
@@ -106,36 +112,103 @@ class _Login extends State<Login> {
                   bottom: 260,
                 ),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start, 
-                  children: [
-                    AppText(text: 'Correo electronico', color: AppColors.maintextColor),
-      
-                    const SizedBox(height: 12),
-      
-                    const MyTextField(hintText: "tucorreo@giftify.com"),
-      
-                    const SizedBox(height: 16),
-      
-                    AppText(
-                      text: 'Contraseña',
-                      color: AppColors.maintextColor
-                    ),
-      
-                    const SizedBox(height: 12),
-      
-                    PasswordTextField(hintText: "mycontrasena123", onChanged: (value) {
-                      setState(() {
-                        password = value;
-                        print(password);
-                      });
-                    }),
-                                        
-                  ]
-                ),
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      AppText(
+                          text: 'Correo electrónico',
+                          color: AppColors.maintextColor),
+                      const SizedBox(height: 12),
+                      SizedBox(
+                        width: 327,
+                        height: 40,
+                        child: TextField(
+                            controller: emailController,
+                            style:
+                                const TextStyle(color: AppColors.maintextColor),
+                            decoration: InputDecoration(
+                              filled: true,
+                              fillColor: AppColors.textFieldBackground,
+                              hintText: "tucorreo@giftify.com",
+                              hintStyle: const TextStyle(
+                                  fontFamily: 'Poppins',
+                                  fontSize: 14,
+                                  color: AppColors.textColor2),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                                borderSide: const BorderSide(
+                                  color: AppColors.mainColor,
+                                  width: 1.5,
+                                ),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                                borderSide: const BorderSide(
+                                  color: AppColors.mainColor,
+                                  width: 1.5,
+                                ),
+                              ),
+                            ),
+                            textAlign: TextAlign.justify,
+                            textAlignVertical: TextAlignVertical.bottom,
+                            onChanged: (value) {
+                              setState(() {
+                                email = value;
+                              });
+                            }),
+                      ),
+                      const SizedBox(height: 16),
+                      AppText(
+                          text: 'Contraseña', color: AppColors.maintextColor),
+                      const SizedBox(height: 12),
+                      TextField(
+                        style: const TextStyle(color: AppColors.maintextColor),
+                        controller: passwordController,
+                        decoration: InputDecoration(
+                          filled: true,
+                          fillColor: AppColors.textFieldBackground,
+                          hintText: "micontraseña123",
+                          hintStyle:
+                              const TextStyle(color: AppColors.textColor2),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: const BorderSide(
+                              color: AppColors.mainColor,
+                              width: 1.5,
+                            ),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: const BorderSide(
+                              color: AppColors.mainColor,
+                              width: 1.5,
+                            ),
+                          ),
+                          suffixIcon: GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                _obscureText = !_obscureText;
+                              });
+                            },
+                            child: Icon(
+                              _obscureText
+                                  ? Icons.visibility
+                                  : Icons.visibility_off,
+                              color: AppColors.textColor2,
+                            ),
+                          ),
+                        ),
+                        obscureText: _obscureText,
+                        onChanged: (value) {
+                          setState(() {
+                            password = value;
+                          });
+                        },
+                      ),
+                    ]),
               ),
-      
+
               //const SizedBox(height: 80),
-      
+
               Container(
                 width: 327,
                 margin: const EdgeInsets.only(
@@ -144,38 +217,27 @@ class _Login extends State<Login> {
                   right: 24,
                   bottom: 100,
                 ),
-                child: Column(
-                  children: [
-                    
-                    ReusableTextButton(
-                      text: 'Crear cuenta', 
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                        // Acción a realizar cuando se presiona el botón
-                        Navigator.push(
+                child: Column(children: [
+                  ReusableTextButton(
+                    text: 'Crear cuenta',
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      // Acción a realizar cuando se presiona el botón
+                      Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => CreateAccount()
-                          )
-                        );
-                      },
-                    ),
-      
-                    //const SizedBox(height: 12),
+                          MaterialPageRoute(
+                              builder: (context) => const CreateAccount()));
+                    },
+                  ),
 
-                    ReusableElevatedButton(
-                      text: 'Iniciar sesion', 
-                      onPressed: (){
-                        Navigator.of(context).pop();
-                        // Acción a realizar cuando se presiona el botón
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => HomeScreen()
-                          )
-                        );
-                      }
-                    )
-                  ]
-                ),
+                  //const SizedBox(height: 12),
+
+                  ReusableElevatedButton(
+                      text: 'Iniciar sesión',
+                      onPressed: () {
+                        login(email, password);
+                      })
+                ]),
               )
             ],
           ),
